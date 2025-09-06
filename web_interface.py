@@ -1,63 +1,82 @@
-"""
-Simple web interface for ProductScene demonstration.
-Mimics the PixShop template approach for easy hackathon presentation.
-"""
-
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import os
-import base64
-from product_scene_core import ProductSceneGenerator
-from PIL import Image
-from io import BytesIO
 import uuid
+from PIL import Image
+from product_scene_core import ProductSceneGenerator
 
 app = Flask(__name__)
+CORS(app)
+
+# Configuration
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['OUTPUT_FOLDER'] = 'outputs'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Ensure directories exist
+# Create directories if they don't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 
-# Initialize the generator
-API_KEY = "AIzaSyA7X1PH_P3B6nTRu5_bcPG1W6_o34cecLE"
+# Initialize the ProductScene generator
+API_KEY = "AIzaSyA7X1PH_P3B6nTRu5_bcPG1W6_o34cecLE"  # Your Google AI API key
 generator = ProductSceneGenerator(API_KEY)
 
-@app.route('/')
-def index():
-    """Main interface page"""
-    return render_template('index.html', scene_presets=generator.scene_presets)
-
-@app.route('/upload', methods=['POST'])
-def upload_product():
-    """Handle product image upload"""
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    """Handle file upload"""
     try:
         if 'product_image' not in request.files:
-            return jsonify({'error': 'No image uploaded'}), 400
+            return jsonify({'error': 'No file provided'}), 400
         
         file = request.files['product_image']
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
         
-        # Save uploaded file
-        filename = f"product_{uuid.uuid4().hex}.jpg"
+        # Generate unique filename
+        filename = f"{uuid.uuid4().hex}_{file.filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        
-        # Detect product category
-        category = generator.detect_product_category(filepath)
         
         return jsonify({
             'success': True,
             'filename': filename,
-            'category': category,
-            'message': f'Product uploaded and detected as: {category}'
+            'message': 'File uploaded successfully'
         })
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/generate_scene', methods=['POST'])
+@app.route('/api/detect_product', methods=['POST'])
+def detect_product():
+    """Detect product type and name using AI"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'error': 'Missing filename'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Product image not found'}), 404
+        
+        # Detect product category
+        category = generator.detect_product_category(filepath)
+        
+        # Get product name from AI
+        product_name = generator.get_product_name(filepath)
+        
+        return jsonify({
+            'success': True,
+            'product_type': category,
+            'product_name': product_name,
+            'message': 'Product detected successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/generate_scene', methods=['POST'])
 def generate_scene():
     """Generate scene with uploaded product using AI photography consultant"""
     try:
@@ -97,7 +116,15 @@ def generate_scene():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/get_photography_recommendations', methods=['POST'])
+@app.route('/api/image/<filename>')
+def serve_image(filename):
+    """Serve generated images"""
+    try:
+        return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
+    except FileNotFoundError:
+        return jsonify({'error': 'Image not found'}), 404
+
+@app.route('/api/get_photography_recommendations', methods=['POST'])
 def get_photography_recommendations():
     """Get AI photography recommendations for uploaded product"""
     try:
@@ -126,7 +153,7 @@ def get_photography_recommendations():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/assess_quality', methods=['POST'])
+@app.route('/api/assess_quality', methods=['POST'])
 def assess_quality():
     """Assess quality of generated image using AI"""
     try:
@@ -153,7 +180,7 @@ def assess_quality():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/create_style_guide', methods=['POST'])
+@app.route('/api/create_style_guide', methods=['POST'])
 def create_style_guide():
     """Create AI-powered style guide from reference image"""
     try:
@@ -180,7 +207,7 @@ def create_style_guide():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/conversational_edit', methods=['POST'])
+@app.route('/api/conversational_edit', methods=['POST'])
 def conversational_edit():
     """Apply conversational edits"""
     try:
@@ -193,98 +220,25 @@ def conversational_edit():
         
         filepath = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
         if not os.path.exists(filepath):
-            return jsonify({'error': 'Scene image not found'}), 404
-        
-        # Load current image
-        current_image = Image.open(filepath)
-        
-        # Apply edit
-        edited_image = generator.conversational_edit(current_image, edit_request)
-        
-        # Save edited image
-        new_filename = f"edited_{uuid.uuid4().hex}.png"
-        new_path = os.path.join(app.config['OUTPUT_FOLDER'], new_filename)
-        edited_image.save(new_path)
-        
-        return jsonify({
-            'success': True,
-            'output_filename': new_filename,
-            'message': f'Applied edit: {edit_request}'
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/export_formats', methods=['POST'])
-def export_formats():
-    """Export marketing formats"""
-    try:
-        data = request.json
-        output_filename = data.get('output_filename')
-        product_name = data.get('product_name', 'product')
-        
-        if not output_filename:
-            return jsonify({'error': 'Missing output filename'}), 400
-        
-        filepath = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-        if not os.path.exists(filepath):
             return jsonify({'error': 'Image not found'}), 404
         
-        # Load image
+        # Load image and apply conversational edit
         image = Image.open(filepath)
+        edited_image = generator.conversational_edit(image, edit_request)
         
-        # Export formats to the outputs folder
-        exported_files = {}
-        
-        # Instagram Square (1080x1080)
-        instagram_square = image.copy()
-        instagram_square.thumbnail((1080, 1080), Image.Resampling.LANCZOS)
-        instagram_square_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{product_name}_instagram_square.png")
-        instagram_square.save(instagram_square_path)
-        exported_files["instagram_square"] = f"{product_name}_instagram_square.png"
-        
-        # Instagram Story (1080x1920)
-        story = image.copy()
-        story = story.resize((1080, 1920), Image.Resampling.LANCZOS)
-        story_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{product_name}_instagram_story.png")
-        story.save(story_path)
-        exported_files["instagram_story"] = f"{product_name}_instagram_story.png"
-        
-        # Hero Banner (1920x1080)
-        hero = image.copy()
-        hero = hero.resize((1920, 1080), Image.Resampling.LANCZOS)
-        hero_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{product_name}_hero_banner.png")
-        hero.save(hero_path)
-        exported_files["hero_banner"] = f"{product_name}_hero_banner.png"
-        
-        # Original high-res
-        original_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{product_name}_original.png")
-        image.save(original_path)
-        exported_files["original"] = f"{product_name}_original.png"
+        # Save edited image
+        edited_filename = f"edited_{uuid.uuid4().hex}.png"
+        edited_path = os.path.join(app.config['OUTPUT_FOLDER'], edited_filename)
+        edited_image.save(edited_path)
         
         return jsonify({
             'success': True,
-            'exported_files': exported_files,
-            'message': 'Marketing formats exported successfully'
+            'output_filename': edited_filename,
+            'message': 'Conversational edit applied successfully'
         })
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/image/<filename>')
-def serve_image(filename):
-    """Serve generated images"""
-    filepath = os.path.join(app.config['OUTPUT_FOLDER'], filename)
-    if os.path.exists(filepath):
-        return send_file(filepath)
-    else:
-        return "Image not found", 404
-
 if __name__ == '__main__':
-    print("🍌 ProductScene Web Interface")
-    print("=" * 40)
-    print("Starting web server...")
-    print("Open http://localhost:5000 in your browser")
-    print("=" * 40)
-    
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, port=5000)

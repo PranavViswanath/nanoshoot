@@ -1,123 +1,149 @@
-# 🍌 ProductScene - Nano Banana Hackathon Submission
+# ProductScene - AI-Powered Product Photography
 
-**Professional Product Photography with AI** - Transform any product photo into stunning lifestyle shots in minutes, not weeks.
-
-## 🎯 The Challenge Solution
-
-ProductScene leverages Nano Banana's unique capabilities to solve the expensive product photography problem:
-
-- **Multi-image scene fusion**: Places products naturally in professional environments
-- **Conversational editing**: Iterative refinements without losing context  
-- **Professional composition**: Commercial photography quality automatically
-- **Marketing-ready exports**: Instagram, stories, banners, hero images
+Transform your product photos into professional lifestyle shots using Google Gemini AI and Nano Banana's multi-image scene fusion capabilities.
 
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
 ```bash
+# Backend dependencies
 pip install -r requirements.txt
+
+# Frontend dependencies
+cd frontend
+npm install
 ```
 
-### 2. Run the Demo
+### 2. Set Up API Key
+Update your Google AI API key in `example_cat_generation.py`:
+```python
+API_KEY = "YOUR_GOOGLE_AI_API_KEY"
+```
+
+### 3. Launch the Application
 ```bash
-# Test the core system
-python demo_workflow.py test
-
-# Run the full 90-second demo
-python demo_workflow.py
-
-# Launch the web interface
+# Terminal 1: Start Flask backend
 python web_interface.py
+
+# Terminal 2: Start React frontend
+cd frontend
+npm run dev
 ```
+Then open http://localhost:3000 in your browser.
 
-### 3. Web Interface
-Open http://localhost:5000 for the interactive demo interface.
+## 🎯 What ProductScene Does
 
-## 🎬 Demo Flow (90 Seconds)
+**"One Product, Infinite Scenes"** - Upload any product photo and generate professional lifestyle shots in multiple environments:
 
-1. **Product Upload** (15s): Upload any product → Auto-detect category
-2. **Scene Generation** (15s): Select environment → Generate professional lifestyle shot  
-3. **Conversational Edit** (20s): "Add a skateboard" → Seamless prop addition
-4. **Style Refinement** (20s): "Make it vintage" → Color grading with product accuracy
-5. **Asset Export** (10s): Download Instagram, story, banner formats
-6. **Impact Statement** (10s): "$2,000 photoshoot → 2 minutes"
+- 🏙️ **Urban Rooftop** - Modern city skyline with golden hour lighting
+- ☕ **Coffee Shop** - Warm, inviting café atmosphere  
+- 💪 **Modern Gym** - Clean, athletic environment
+- 🏖️ **Beach Lifestyle** - Relaxed coastal vibes
+- 🏢 **Professional Office** - Clean workspace setting
 
-## 🏗️ System Architecture
+## 🧠 AI Intelligence Features
 
-### Core Components
-- **`product_scene_core.py`** - Main ProductScene generator with scene presets and conversational editing
-- **`demo_workflow.py`** - Complete 90-second demonstration script
-- **`web_interface.py`** - Flask web app for interactive demonstration
-- **`templates/index.html`** - Modern UI mimicking PixShop template approach
+### Smart Product Detection
+- **AI Analysis**: Automatically detects product type (footwear, food, devices)
+- **Intelligent Suggestions**: Product-specific scene recommendations
+- **Professional Insights**: AI photography expert analysis
 
-### Scene Presets
-- **Urban Rooftop**: Modern city skyline with golden hour lighting
-- **Coffee Shop**: Warm, inviting café atmosphere  
-- **Gym**: Clean, athletic environment
-- **Beach**: Relaxed coastal vibes
-- **Office**: Professional workspace setting
+### Enhanced Generation Process
+- **Product-Specific Updates**: Real-time AI processing feedback
+- **Quality Validation**: Commercial photography standards assessment
+- **Professional Results**: AI-optimized lighting, composition, and positioning
 
-### Key Features
-- **Product Category Detection**: Auto-analyzes uploaded products
-- **Professional Prompting**: Commercial photography templates
-- **Multi-format Export**: Instagram square, story, hero banner, original
-- **Conversational Editing**: Natural language refinements
-- **Visual Consistency**: Maintains product accuracy across edits
+### Marketing-Focused Landing Page
+- **Clear Value Proposition**: Traditional vs ProductScene comparison
+- **Professional Branding**: AI-powered photography studio positioning
+- **Intuitive Workflow**: Step-by-step guided experience
+
+## 🏗️ Architecture
+
+### Frontend Components
+- **LandingPage**: Marketing-focused introduction with value proposition
+- **ProductDetection**: AI-powered product analysis and scene suggestions
+- **EnhancedGeneration**: Product-specific generation with real-time updates
+- **PhotographyInsights**: Comprehensive AI analysis display
+
+### Technology Stack
+- **React + TypeScript**: Modern, type-safe frontend
+- **Tailwind CSS**: Beautiful, responsive design
+- **Framer Motion**: Smooth animations and transitions
+- **Google Gemini AI**: Product analysis and scene generation
+- **Nano Banana**: Multi-image scene fusion capabilities
+
+## 🎬 User Experience Flow
+
+1. **Landing Page** - Clear value proposition and product comparison
+2. **Upload Product** - Drag & drop with AI analysis indicators
+3. **AI Detection** - Product type detection with smart scene suggestions
+4. **Enhanced Generation** - Product-specific AI processing with real-time updates
+5. **Results & Insights** - Professional results with AI quality assessment
 
 ## 🏆 Hackathon Advantages
 
-### Nano Banana Unique Capabilities
-1. **Multi-image Fusion**: Creates photorealistic composites that look like studio shoots
-2. **Conversational Editing**: Iterative changes without starting over
-3. **Professional Quality**: Commercial photography standards automatically
-4. **Brand Safety**: Consistent, marketing-ready outputs
+### Technical Innovation
+- **AI-to-AI Workflow**: Gemini consulting Gemini for optimal results
+- **Product-Specific Intelligence**: Tailored processing for different product types
+- **Real-time Feedback**: Live AI processing updates and insights
+- **Professional Quality**: Commercial photography standards validation
 
-### Market Impact
-- **Universal Need**: Every e-commerce business needs lifestyle photography
-- **Cost Savings**: Eliminates $2,000+ photoshoot costs
-- **Speed Advantage**: Minutes instead of weeks for campaign assets
-- **Quality Parity**: Results competing with traditional photography
+### User Experience
+- **Marketing-Focused**: Clear value proposition and comparison
+- **Intuitive Workflow**: Simplified, guided experience
+- **Visual Feedback**: Beautiful loading states and progress indicators
+- **Educational Value**: Users learn about AI photography expertise
 
-## 📁 Project Files
+### Business Value
+- **Cost Reduction**: No photographer or studio needed
+- **Speed**: Instant professional results with AI intelligence
+- **Scalability**: Unlimited scenes and variations
+- **Professional Quality**: AI-validated commercial standards
+
+## 📁 Project Structure
 
 ```
 nanoshoot/
-├── product_scene_core.py      # Core ProductScene generator
-├── demo_workflow.py           # 90-second demo script  
-├── web_interface.py           # Flask web application
-├── example_cat_generation.py  # Basic Nano Banana example
-├── templates/
-│   └── index.html            # Web interface template
-├── requirements.txt           # Python dependencies
-└── README.md                 # This file
+├── frontend/                 # React + TypeScript frontend
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   │   ├── LandingPage.tsx
+│   │   │   ├── ProductDetection.tsx
+│   │   │   ├── EnhancedGeneration.tsx
+│   │   │   └── PhotographyInsights.tsx
+│   │   └── App.tsx          # Main application
+│   ├── package.json         # Frontend dependencies
+│   └── vite.config.ts       # Build configuration
+├── product_scene_core.py    # Core AI orchestration
+├── example_cat_generation.py # API setup example
+└── requirements.txt         # Python dependencies
 ```
 
-## 🔧 Technical Implementation
+## 🔧 Configuration
 
-### API Integration
-- Uses Gemini 2.5 Flash Image Preview model
-- Implements image understanding for product detection
-- Leverages multi-image fusion for scene generation
-- Applies conversational editing for refinements
+### Environment Variables
+```bash
+export GOOGLE_AI_API_KEY="your_api_key_here"
+```
 
-### Web Interface
-- Flask-based responsive design
-- Drag-and-drop product upload
-- Real-time scene generation
-- Interactive conversational editing
-- Multi-format export system
+### Frontend Development
+```bash
+cd frontend
+npm run dev    # Development server
+npm run build  # Production build
+```
 
-## 🎯 Judging Criteria Alignment
+## 🚀 Deployment
 
-- **Innovation (40%)**: Novel application of multi-image fusion for product photography
-- **Technical Execution (30%)**: Robust API integration with professional prompting
-- **Impact (20%)**: Solves real e-commerce photography problem
-- **Presentation (10%)**: Clear demo flow with visual proof of concept
+The application is designed for easy deployment:
+- **Frontend**: Deploy to Vercel, Netlify, or any static hosting
+- **Backend**: Deploy to Google Cloud Run or similar platform
 
-## 🚀 Deployment Ready
+## 📝 License
 
-The system is designed for easy deployment to Cloud Run following the hackathon kit's PixShop template approach. All components are containerized and ready for live demonstration.
+MIT License - See LICENSE file for details.
 
 ---
 
-**Built for the Nano Banana 48-Hour Challenge** - Showcasing the future of AI-powered product photography.
+**Built for the Nano Banana Hackathon** - Showcasing the power of Google Gemini AI for professional product photography with an intuitive, marketing-focused user experience.

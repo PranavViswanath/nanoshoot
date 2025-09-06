@@ -368,7 +368,7 @@ class ProductSceneGenerator:
             response = self.client.models.generate_content(
                 model="gemini-2.5-flash",
                 contents=[
-                    "Analyze this product image and determine the category. Respond with only one word: footwear, clothing, electronics, accessories, home, beauty, or other.",
+                    "Analyze this product image and determine the category. Respond with only one word: footwear, food, or devices.",
                     {
                         "inline_data": {
                             "mime_type": "image/jpeg",
@@ -379,11 +379,39 @@ class ProductSceneGenerator:
             )
             
             category = response.text.strip().lower()
-            return category if category in ["footwear", "clothing", "electronics", "accessories", "home", "beauty", "other"] else "other"
+            return category if category in ["footwear", "food", "devices"] else "devices"
             
         except Exception as e:
             print(f"Error detecting product category: {e}")
-            return "other"
+            return "devices"
+    
+    def get_product_name(self, image_path: str) -> str:
+        """
+        Get a descriptive name for the product using AI.
+        """
+        try:
+            with open(image_path, 'rb') as image_file:
+                image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            
+            # Use Gemini's image understanding to get product name
+            response = self.client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[
+                    "Look at this product image and provide a short, descriptive name (2-4 words max). Just return the name, nothing else.",
+                    {
+                        "inline_data": {
+                            "mime_type": "image/jpeg",
+                            "data": image_data
+                        }
+                    }
+                ]
+            )
+            
+            return response.text.strip()
+            
+        except Exception as e:
+            print(f"Error getting product name: {e}")
+            return "Your Product"
     
     def generate_scene(self, product_image_path: str, scene_preset: str, 
                       product_description: str = None, custom_prompt: str = None, 
