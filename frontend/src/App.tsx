@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Upload, Sparkles, Download, Camera, Palette, Zap } from 'lucide-react'
+import { Upload, Sparkles, Download, Camera, Palette, Zap, Brain } from 'lucide-react'
 import UploadStep from './components/UploadStep'
 import SceneSelection from './components/SceneSelection'
 import GeneratedImage from './components/GeneratedImage'
 import ConversationalEdit from './components/ConversationalEdit'
 import ExportFormats from './components/ExportFormats'
+import PhotographyInsights from './components/PhotographyInsights'
 
 interface ScenePreset {
   name: string
@@ -46,13 +47,15 @@ function App() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [selectedScene, setSelectedScene] = useState<string>('')
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>('')
+  const [photographyInsights, setPhotographyInsights] = useState<any>(null)
+  const [showInsights, setShowInsights] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const steps = [
     { id: 'upload', title: 'Upload Product', icon: Upload, color: 'from-blue-500 to-cyan-500' },
-    { id: 'scene', title: 'Choose Scene', icon: Camera, color: 'from-purple-500 to-pink-500' },
-    { id: 'generated', title: 'Generated Image', icon: Sparkles, color: 'from-green-500 to-emerald-500' },
-    { id: 'edit', title: 'Edit & Refine', icon: Palette, color: 'from-orange-500 to-red-500' },
+    { id: 'scene', title: 'AI Scene Analysis', icon: Brain, color: 'from-purple-500 to-pink-500' },
+    { id: 'generated', title: 'AI Generated Image', icon: Sparkles, color: 'from-green-500 to-emerald-500' },
+    { id: 'edit', title: 'AI Edit & Refine', icon: Palette, color: 'from-orange-500 to-red-500' },
     { id: 'export', title: 'Export Assets', icon: Download, color: 'from-indigo-500 to-purple-500' }
   ]
 
@@ -70,16 +73,22 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🍌</span>
+                <Brain className="w-7 h-7 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold gradient-text">ProductScene</h1>
-                <p className="text-gray-600">AI-Powered Product Photography</p>
+                <p className="text-gray-600">AI Photography Studio with Intelligent Analysis</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Zap className="w-4 h-4" />
-              <span>Powered by Nano Banana</span>
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>Google Gemini AI</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Zap className="w-4 h-4" />
+                <span>Nano Banana</span>
+              </div>
             </div>
           </div>
         </div>
@@ -160,8 +169,9 @@ function App() {
                     setSelectedScene(scene)
                     setCurrentStep('generated')
                   }}
-                  onGenerate={(imageUrl) => {
+                  onGenerate={(imageUrl, insights) => {
                     setGeneratedImageUrl(imageUrl)
+                    setPhotographyInsights(insights)
                     setCurrentStep('generated')
                   }}
                   uploadedFile={uploadedFile}
@@ -183,6 +193,8 @@ function App() {
                   imageUrl={generatedImageUrl}
                   onEdit={() => setCurrentStep('edit')}
                   onExport={() => setCurrentStep('export')}
+                  onShowInsights={() => setShowInsights(true)}
+                  photographyInsights={photographyInsights}
                 />
               </motion.div>
             )}
@@ -225,8 +237,17 @@ function App() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Photography Insights Modal */}
+      {showInsights && (
+        <PhotographyInsights
+          insights={photographyInsights}
+          onClose={() => setShowInsights(false)}
+        />
+      )}
     </div>
   )
 }
 
 export default App
+

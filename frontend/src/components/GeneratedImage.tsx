@@ -1,17 +1,21 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Palette, Download, ArrowLeft, Sparkles, CheckCircle } from 'lucide-react'
+import { Palette, Download, ArrowLeft, Sparkles, CheckCircle, Brain, Star } from 'lucide-react'
 
 interface GeneratedImageProps {
   imageUrl: string
   onEdit: () => void
   onExport: () => void
+  onShowInsights: () => void
+  photographyInsights?: any
 }
 
 const GeneratedImage: React.FC<GeneratedImageProps> = ({
   imageUrl,
   onEdit,
-  onExport
+  onExport,
+  onShowInsights,
+  photographyInsights
 }) => {
   return (
     <div className="space-y-8">
@@ -26,10 +30,28 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             Scene Generated!
           </h2>
         </div>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
           Your product has been professionally placed in the selected environment. 
           Ready for conversational editing or direct export to marketing formats.
         </p>
+        
+        {/* AI Quality Score */}
+        {photographyInsights?.quality_assessment && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-700 px-4 py-2 rounded-full mb-4"
+          >
+            <Star className="w-5 h-5" />
+            <span className="font-medium">
+              AI Quality Score: {photographyInsights.quality_assessment.quality_score}/100
+            </span>
+            <span className="text-sm opacity-75">
+              ({photographyInsights.quality_assessment.overall_quality})
+            </span>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          </motion.div>
+        )}
       </motion.div>
 
       <motion.div
@@ -65,7 +87,7 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto"
+        className="flex flex-col sm:flex-row gap-4 justify-center max-w-3xl mx-auto"
       >
         <button
           onClick={onEdit}
@@ -74,6 +96,16 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
           <Palette className="w-6 h-6" />
           <span>Edit & Refine</span>
         </button>
+        
+        {photographyInsights && (
+          <button
+            onClick={onShowInsights}
+            className="btn-secondary flex items-center justify-center space-x-3 text-lg px-8 py-4"
+          >
+            <Brain className="w-6 h-6" />
+            <span>View AI Insights</span>
+          </button>
+        )}
         
         <button
           onClick={onExport}

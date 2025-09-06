@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, Image as ImageIcon, CheckCircle } from 'lucide-react'
+import { Upload, Image as ImageIcon, CheckCircle, Brain } from 'lucide-react'
 
 interface UploadStepProps {
   onUpload: (file: File) => void
@@ -50,12 +50,27 @@ const UploadStep: React.FC<UploadStepProps> = ({ onUpload, isLoading }) => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h2 className="text-4xl font-bold gradient-text mb-4">
-          Upload Your Product
-        </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Drag and drop your product image or click to browse. Our AI will automatically detect the product category and prepare it for professional scene generation.
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
+            <Brain className="w-6 h-6 text-white" />
+          </div>
+          <h2 className="text-4xl font-bold gradient-text">
+            Upload Your Product
+          </h2>
+        </div>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-4">
+          Drag and drop your product image or click to browse. Our AI Photography Expert will automatically analyze your product and prepare intelligent scene recommendations.
         </p>
+        <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span>Google Gemini AI Analysis</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span>Professional Recommendations</span>
+          </div>
+        </div>
       </motion.div>
 
       <motion.div

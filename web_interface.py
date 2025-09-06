@@ -59,12 +59,13 @@ def upload_product():
 
 @app.route('/generate_scene', methods=['POST'])
 def generate_scene():
-    """Generate scene with uploaded product"""
+    """Generate scene with uploaded product using AI photography consultant"""
     try:
         data = request.json
         filename = data.get('filename')
         scene_preset = data.get('scene_preset')
         product_description = data.get('product_description', 'product')
+        use_ai_consultant = data.get('use_ai_consultant', True)
         
         if not filename or not scene_preset:
             return jsonify({'error': 'Missing required parameters'}), 400
@@ -73,11 +74,12 @@ def generate_scene():
         if not os.path.exists(filepath):
             return jsonify({'error': 'Product image not found'}), 404
         
-        # Generate scene
-        generated_image = generator.generate_scene(
+        # Generate scene with AI consultant
+        generated_image, photography_insights = generator.generate_scene(
             product_image_path=filepath,
             scene_preset=scene_preset,
-            product_description=product_description
+            product_description=product_description,
+            use_ai_consultant=use_ai_consultant
         )
         
         # Save generated image
@@ -88,7 +90,91 @@ def generate_scene():
         return jsonify({
             'success': True,
             'output_filename': output_filename,
-            'message': f'Generated {generator.scene_presets[scene_preset]["name"]} scene'
+            'photography_insights': photography_insights,
+            'message': f'Generated {generator.scene_presets[scene_preset]["name"]} scene with AI intelligence'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_photography_recommendations', methods=['POST'])
+def get_photography_recommendations():
+    """Get AI photography recommendations for uploaded product"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        product_description = data.get('product_description', 'product')
+        
+        if not filename:
+            return jsonify({'error': 'Missing filename'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Product image not found'}), 404
+        
+        # Get AI photography recommendations
+        recommendations = generator.get_photography_recommendations(
+            filepath, product_description
+        )
+        
+        return jsonify({
+            'success': True,
+            'recommendations': recommendations,
+            'message': 'AI photography recommendations generated'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/assess_quality', methods=['POST'])
+def assess_quality():
+    """Assess quality of generated image using AI"""
+    try:
+        data = request.json
+        output_filename = data.get('output_filename')
+        
+        if not output_filename:
+            return jsonify({'error': 'Missing output filename'}), 400
+        
+        filepath = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Image not found'}), 404
+        
+        # Load image and assess quality
+        image = Image.open(filepath)
+        quality_assessment = generator.ai_quality_assessment(image)
+        
+        return jsonify({
+            'success': True,
+            'quality_assessment': quality_assessment,
+            'message': 'AI quality assessment completed'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/create_style_guide', methods=['POST'])
+def create_style_guide():
+    """Create AI-powered style guide from reference image"""
+    try:
+        data = request.json
+        output_filename = data.get('output_filename')
+        
+        if not output_filename:
+            return jsonify({'error': 'Missing output filename'}), 400
+        
+        filepath = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Image not found'}), 404
+        
+        # Load image and create style guide
+        image = Image.open(filepath)
+        style_guide = generator.establish_campaign_style_with_ai(image)
+        
+        return jsonify({
+            'success': True,
+            'style_guide': style_guide,
+            'message': 'AI style guide created'
         })
         
     except Exception as e:
