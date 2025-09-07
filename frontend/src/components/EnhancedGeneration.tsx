@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, Sparkles, Camera, Lightbulb, Zap, CheckCircle } from 'lucide-react'
+import { Brain, Sparkles, Lightbulb, Zap, CheckCircle } from 'lucide-react'
 
 interface EnhancedGenerationProps {
   productType: string
@@ -145,8 +145,9 @@ const EnhancedGeneration: React.FC<EnhancedGenerationProps> = ({
 
     } catch (error) {
       console.error('❌ Frontend error generating scene:', error)
-      console.error('Error details:', error.message)
-      alert(`Error generating scene: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
+      console.error('Error details:', errorMessage)
+      alert(`Error generating scene: ${errorMessage}`)
       setGenerationStage('idle')
     }
   }
