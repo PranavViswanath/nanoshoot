@@ -240,5 +240,43 @@ def conversational_edit():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/export_formats', methods=['POST'])
+def export_formats():
+    """Export image in multiple marketing formats"""
+    try:
+        data = request.json
+        output_filename = data.get('output_filename')
+        product_name = data.get('product_name', 'product')
+        
+        if not output_filename:
+            return jsonify({'error': 'Missing output filename'}), 400
+        
+        filepath = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Image not found'}), 404
+        
+        # Load image and export in multiple formats
+        image = Image.open(filepath)
+        exported_files = generator.export_marketing_formats(image, product_name)
+        
+        # Move exported files to outputs folder and update paths
+        updated_files = {}
+        for format_name, filename in exported_files.items():
+            if os.path.exists(filename):
+                # Move to outputs folder
+                new_filename = f"export_{uuid.uuid4().hex}_{format_name}.png"
+                new_path = os.path.join(app.config['OUTPUT_FOLDER'], new_filename)
+                os.rename(filename, new_path)
+                updated_files[format_name] = new_filename
+        
+        return jsonify({
+            'success': True,
+            'exported_files': updated_files,
+            'message': 'Images exported in multiple formats successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
