@@ -22,6 +22,9 @@ const ConversationalEdit: React.FC<ConversationalEditProps> = ({
   const [editRequest, setEditRequest] = useState('')
   const [editHistory, setEditHistory] = useState<string[]>([])
 
+  // Debug logging
+  console.log('ConversationalEdit rendered with imageUrl:', imageUrl)
+
   const handleEdit = async () => {
     if (!editRequest.trim() || isLoading) return
 
@@ -68,6 +71,16 @@ const ConversationalEdit: React.FC<ConversationalEditProps> = ({
     "Make it feel more luxurious"
   ]
 
+  // Safety check for imageUrl
+  if (!imageUrl) {
+    return (
+      <div className="text-center py-16">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading Image...</h2>
+        <p className="text-gray-600">Please wait while we load your generated image.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8">
       <motion.div
@@ -96,6 +109,10 @@ const ConversationalEdit: React.FC<ConversationalEditProps> = ({
               src={imageUrl}
               alt="Current scene"
               className="w-full h-auto rounded-xl shadow-lg"
+              onError={(e) => {
+                console.error('Image failed to load:', imageUrl)
+                e.currentTarget.style.display = 'none'
+              }}
             />
             {isLoading && (
               <motion.div

@@ -6,17 +6,22 @@ interface GeneratedImageProps {
   imageUrl: string
   onEdit: () => void
   onExport: () => void
-  onShowInsights: () => void
-  photographyInsights?: any
 }
 
 const GeneratedImage: React.FC<GeneratedImageProps> = ({
   imageUrl,
   onEdit,
-  onExport,
-  onShowInsights,
-  photographyInsights
+  onExport
 }) => {
+  if (!imageUrl) {
+    return (
+      <div className="text-center py-16">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading Image...</h2>
+        <p className="text-gray-600">Please wait while we load your generated image.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8">
       <motion.div
@@ -35,23 +40,6 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
           Ready for conversational editing or direct export to marketing formats.
         </p>
         
-        {/* AI Quality Score */}
-        {photographyInsights?.quality_assessment && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-700 px-4 py-2 rounded-full mb-4"
-          >
-            <Star className="w-5 h-5" />
-            <span className="font-medium">
-              AI Quality Score: {photographyInsights.quality_assessment.quality_score}/100
-            </span>
-            <span className="text-sm opacity-75">
-              ({photographyInsights.quality_assessment.overall_quality})
-            </span>
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          </motion.div>
-        )}
       </motion.div>
 
       <motion.div
@@ -97,15 +85,6 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
           <span>Edit & Refine</span>
         </button>
         
-        {photographyInsights && (
-          <button
-            onClick={onShowInsights}
-            className="btn-secondary flex items-center justify-center space-x-3 text-lg px-8 py-4"
-          >
-            <Brain className="w-6 h-6" />
-            <span>View AI Insights</span>
-          </button>
-        )}
         
         <button
           onClick={onExport}

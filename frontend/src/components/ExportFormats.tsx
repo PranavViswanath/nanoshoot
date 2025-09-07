@@ -176,7 +176,7 @@ const ExportFormats: React.FC<ExportFormatsProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             {exportedFiles.map((file, index) => (
               <motion.div
                 key={file.format}
@@ -238,39 +238,6 @@ const ExportFormats: React.FC<ExportFormatsProps> = ({
         )}
       </motion.div>
 
-      {/* Impact Statement */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="text-center max-w-4xl mx-auto"
-      >
-        <div className="card bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">
-            🎯 Traditional vs. ProductScene
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <div>
-              <h4 className="font-semibold text-red-600 mb-2">Traditional Photoshoot</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• $2,000+ photographer fees</li>
-                <li>• 2+ weeks scheduling & coordination</li>
-                <li>• Studio rental & equipment costs</li>
-                <li>• Limited iterations & edits</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-green-600 mb-2">ProductScene AI</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• $0 cost with free API tier</li>
-                <li>• 2 minutes from upload to export</li>
-                <li>• Unlimited scenes & environments</li>
-                <li>• Conversational editing & refinements</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </motion.div>
     </div>
   )
 }

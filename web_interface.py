@@ -4,6 +4,7 @@ import os
 import uuid
 from PIL import Image
 from product_scene_core import ProductSceneGenerator
+# from config import GOOGLE_AI_API_KEY
 
 app = Flask(__name__)
 CORS(app)
@@ -18,8 +19,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 
 # Initialize the ProductScene generator
-API_KEY = "AIzaSyA7X1PH_P3B6nTRu5_bcPG1W6_o34cecLE"  # Your Google AI API key
-generator = ProductSceneGenerator(API_KEY)
+generator = ProductSceneGenerator("AIzaSyA7X1PH_P3B6nTRu5_bcPG1W6_o34cecLE")
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
@@ -106,14 +106,19 @@ def generate_scene():
         output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
         generated_image.save(output_path)
         
-        return jsonify({
+        response_data = {
             'success': True,
             'output_filename': output_filename,
             'photography_insights': photography_insights,
             'message': f'Generated {generator.scene_presets[scene_preset]["name"]} scene with AI intelligence'
-        })
+        }
+        print(f"🔍 Backend sending response: {response_data}")
+        return jsonify(response_data)
         
     except Exception as e:
+        print(f"❌ Error in generate_scene: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/image/<filename>')
@@ -235,6 +240,84 @@ def conversational_edit():
             'success': True,
             'output_filename': edited_filename,
             'message': 'Conversational edit applied successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/generate_multi_format', methods=['POST'])
+def generate_multi_format():
+    """Generate scene in multiple aspect ratios"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        scene_preset = data.get('scene_preset')
+        product_description = data.get('product_description')
+        use_ai_consultant = data.get('use_ai_consultant', True)
+        
+        if not filename or not scene_preset:
+            return jsonify({'error': 'Missing required parameters'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Image not found'}), 404
+        
+        # Generate multi-format scenes
+        format_images = generator.generate_multi_format_scene(
+            filepath, scene_preset, product_description, None, use_ai_consultant
+        )
+        
+        # Save each format to outputs folder
+        saved_files = {}
+        for format_name, image in format_images.items():
+            output_filename = f"multi_{format_name}_{uuid.uuid4().hex}.png"
+            output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+            image.save(output_path)
+            saved_files[format_name] = output_filename
+        
+        return jsonify({
+            'success': True,
+            'format_files': saved_files,
+            'message': 'Multi-format scenes generated successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/generate_variations', methods=['POST'])
+def generate_variations():
+    """Generate 5 different variations of the same scene"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        scene_preset = data.get('scene_preset')
+        product_description = data.get('product_description')
+        use_ai_consultant = data.get('use_ai_consultant', True)
+        
+        if not filename or not scene_preset:
+            return jsonify({'error': 'Missing required parameters'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Image not found'}), 404
+        
+        # Generate scene variations
+        variation_images = generator.generate_scene_variations(
+            filepath, scene_preset, product_description, None, use_ai_consultant
+        )
+        
+        # Save each variation to outputs folder
+        saved_files = {}
+        for variation_name, image in variation_images.items():
+            output_filename = f"variation_{variation_name}_{uuid.uuid4().hex}.png"
+            output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+            image.save(output_path)
+            saved_files[variation_name] = output_filename
+        
+        return jsonify({
+            'success': True,
+            'variation_files': saved_files,
+            'message': '5 scene variations generated successfully'
         })
         
     except Exception as e:

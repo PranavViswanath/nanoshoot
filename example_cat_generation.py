@@ -2,11 +2,12 @@ import os
 from google import genai
 from PIL import Image
 from io import BytesIO
+from config import GOOGLE_AI_API_KEY
 
 # --- IMPORTANT ---
-# Paste your API key here. For better security, we recommend using environment variables.
-# For example: API_KEY=os.environ.get("GEMINI_API_KEY")
-API_KEY = "AIzaSyA7X1PH_P3B6nTRu5_bcPG1W6_o34cecLE"
+# API key is now loaded from config.py which reads from environment variables
+# For better security, set GOOGLE_AI_API_KEY in your .env file
+API_KEY = GOOGLE_AI_API_KEY
 # -----------------
 
 # Configure the client with your API key

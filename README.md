@@ -15,9 +15,15 @@ npm install
 ```
 
 ### 2. Set Up API Key
-Update your Google AI API key in `example_cat_generation.py`:
-```python
-API_KEY = "YOUR_GOOGLE_AI_API_KEY"
+Create a `.env` file in the project root with your Google AI API key:
+```bash
+# Create .env file
+echo "GOOGLE_AI_API_KEY=your_api_key_here" > .env
+```
+
+Or set it as an environment variable:
+```bash
+export GOOGLE_AI_API_KEY="your_api_key_here"
 ```
 
 ### 3. Launch the Application

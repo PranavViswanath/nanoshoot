@@ -58,6 +58,57 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </motion.div>
 
+      {/* Creative Director Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="card bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200"
+      >
+        <div className="text-center py-8">
+          <div className="w-20 h-20 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Brain className="w-10 h-10 text-white" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            Your In-House Creative Director
+          </h3>
+          <p className="text-lg text-gray-600 max-w-4xl mx-auto mb-6">
+            ProductScene applies world-class photography principles and creative direction expertise. 
+            Every image is crafted using the same best practices and feedback loops that trained 
+            award-winning creative directors and commercial photographers.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Camera className="w-4 h-4 text-primary-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-1">Professional Composition</h4>
+                <p className="text-sm text-gray-600">Rule of thirds, leading lines, and visual hierarchy</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-primary-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-1">Brand Consistency</h4>
+                <p className="text-sm text-gray-600">Cohesive visual language across all assets</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Brain className="w-4 h-4 text-primary-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-1">Creative Intelligence</h4>
+                <p className="text-sm text-gray-600">AI trained on millions of successful campaigns</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Product Comparison */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

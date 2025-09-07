@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Sparkles, Camera, Lightbulb, Zap, CheckCircle } from 'lucide-react'
 
@@ -7,7 +7,7 @@ interface EnhancedGenerationProps {
   productName: string
   sceneType: string
   uploadedFile: File | null
-  onGenerate: (imageUrl: string, insights: any) => void
+  onGenerate: (imageUrl: string) => void
   onSelect: (scene: string) => void
 }
 
@@ -21,7 +21,6 @@ const EnhancedGeneration: React.FC<EnhancedGenerationProps> = ({
 }) => {
   const [generationStage, setGenerationStage] = useState<'idle' | 'analyzing' | 'generating' | 'assessing' | 'complete'>('idle')
   const [currentUpdate, setCurrentUpdate] = useState('')
-  const [photographyInsights, setPhotographyInsights] = useState<any>(null)
 
   const productSpecificUpdates = {
     footwear: [
@@ -55,7 +54,7 @@ const EnhancedGeneration: React.FC<EnhancedGenerationProps> = ({
     beach: 'Beach Lifestyle'
   }
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (mode: 'single' | 'multi' | 'variations' = 'single') => {
     if (!uploadedFile) return
 
     setGenerationStage('analyzing')
@@ -83,10 +82,21 @@ const EnhancedGeneration: React.FC<EnhancedGenerationProps> = ({
       }
 
       setGenerationStage('generating')
-      setCurrentUpdate('Creating professional lifestyle photography...')
+      const updateMessages = {
+        single: 'Creating professional lifestyle photography...',
+        multi: 'Creating multi-format professional photography...',
+        variations: 'Creating 5 different scene variations...'
+      }
+      setCurrentUpdate(updateMessages[mode])
 
-      // Generate the scene with AI consultant
-      const generateResponse = await fetch('/api/generate_scene', {
+      // Generate the scene with AI consultant (single, multi-format, or variations)
+      const endpoints = {
+        single: '/api/generate_scene',
+        multi: '/api/generate_multi_format', 
+        variations: '/api/generate_variations'
+      }
+      const endpoint = endpoints[mode]
+      const generateResponse = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,26 +109,44 @@ const EnhancedGeneration: React.FC<EnhancedGenerationProps> = ({
         })
       })
       const generateData = await generateResponse.json()
+      console.log('🔍 Frontend received response:', generateData)
 
       if (!generateData.success) {
         throw new Error(generateData.error)
       }
 
       setGenerationStage('assessing')
-      setCurrentUpdate('Validating commercial photography quality...')
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      setCurrentUpdate('Applying professional photography standards...')
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       setGenerationStage('complete')
-      setPhotographyInsights(generateData.photography_insights)
       
       setTimeout(() => {
-        onGenerate(`/api/image/${generateData.output_filename}`, generateData.photography_insights)
+        let imageUrl = ''
+        
+        if (mode === 'multi' && generateData.format_files) {
+          // For multi-format, pass the first format as the main image
+          const firstFormat = Object.values(generateData.format_files)[0] as string
+          imageUrl = `/api/image/${firstFormat}`
+        } else if (mode === 'variations' && generateData.variation_files) {
+          // For variations, pass the first variation as the main image
+          const firstVariation = Object.values(generateData.variation_files)[0] as string
+          imageUrl = `/api/image/${firstVariation}`
+        } else if (generateData.output_filename) {
+          // For single mode or fallback
+          imageUrl = `/api/image/${generateData.output_filename}`
+        }
+        
+        console.log('🔍 Constructed imageUrl:', imageUrl)
+        // Always call onGenerate, even if imageUrl is empty
+        onGenerate(imageUrl)
         onSelect(sceneType)
-      }, 1000)
+      }, 500)
 
     } catch (error) {
-      console.error('Error generating scene:', error)
-      alert('Error generating scene. Please try again.')
+      console.error('❌ Frontend error generating scene:', error)
+      console.error('Error details:', error.message)
+      alert(`Error generating scene: ${error.message}`)
       setGenerationStage('idle')
     }
   }
@@ -141,15 +169,23 @@ const EnhancedGeneration: React.FC<EnhancedGenerationProps> = ({
             <p className="text-gray-600 mb-6">
               Your {productName} will be placed in a {sceneNames[sceneType as keyof typeof sceneNames]} scene with AI-optimized photography.
             </p>
-            <motion.button
-              onClick={handleGenerate}
-              className="btn-primary text-lg px-8 py-3 flex items-center space-x-3 mx-auto"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Sparkles className="w-6 h-6" />
-              <span>Generate with AI</span>
-            </motion.button>
+            <div className="space-y-3">
+              <motion.button
+                onClick={() => handleGenerate('single')}
+                className="btn-primary text-lg px-6 py-3 flex items-center space-x-3 mx-auto w-full max-w-xs"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Sparkles className="w-5 h-5" />
+                <span>Single Image</span>
+              </motion.button>
+              
+              
+              <div className="text-xs text-gray-500 text-center mt-3 space-y-1">
+                <p><strong>3 Formats:</strong> Square (Instagram), Vertical (Stories), Horizontal (Banners)</p>
+                <p><strong>5 Variations:</strong> Close-up, Lifestyle, Overhead, Side-angle, Environmental</p>
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>

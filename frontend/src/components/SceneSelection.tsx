@@ -130,7 +130,7 @@ const SceneSelection: React.FC<SceneSelectionProps> = ({
       // Set the generated image URL and insights
       setGenerationStage('complete')
       setTimeout(() => {
-        onGenerate(`/api/image/${generateData.output_filename}`, generateData.photography_insights)
+        onGenerate(`/api/image/${generateData.output_filename}`)
         onSelect(selectedScene)
       }, 1000)
     } catch (error) {

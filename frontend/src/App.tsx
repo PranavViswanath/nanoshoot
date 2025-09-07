@@ -8,7 +8,6 @@ import EnhancedGeneration from './components/EnhancedGeneration'
 import GeneratedImage from './components/GeneratedImage'
 import ConversationalEdit from './components/ConversationalEdit'
 import ExportFormats from './components/ExportFormats'
-import PhotographyInsights from './components/PhotographyInsights'
 
 type Step = 'landing' | 'upload' | 'detection' | 'generation' | 'generated' | 'edit' | 'export'
 
@@ -18,8 +17,6 @@ function App() {
   const [detectedProduct, setDetectedProduct] = useState<{type: string, name: string} | null>(null)
   const [selectedScene, setSelectedScene] = useState<string>('')
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>('')
-  const [photographyInsights, setPhotographyInsights] = useState<any>(null)
-  const [showInsights, setShowInsights] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const steps = [
@@ -172,9 +169,9 @@ function App() {
                 productName={detectedProduct.name}
                 sceneType={selectedScene}
                 uploadedFile={uploadedFile}
-                onGenerate={(imageUrl, insights) => {
+                onGenerate={(imageUrl) => {
+                  console.log('🔍 onGenerate called with imageUrl:', imageUrl)
                   setGeneratedImageUrl(imageUrl)
-                  setPhotographyInsights(insights)
                   setCurrentStep('generated')
                 }}
                 onSelect={(scene) => setSelectedScene(scene)}
@@ -194,8 +191,6 @@ function App() {
                 imageUrl={generatedImageUrl}
                 onEdit={() => setCurrentStep('edit')}
                 onExport={() => setCurrentStep('export')}
-                onShowInsights={() => setShowInsights(true)}
-                photographyInsights={photographyInsights}
               />
             </motion.div>
           )}
@@ -238,13 +233,6 @@ function App() {
         </AnimatePresence>
       </div>
 
-      {/* Photography Insights Modal */}
-      {showInsights && (
-        <PhotographyInsights
-          insights={photographyInsights}
-          onClose={() => setShowInsights(false)}
-        />
-      )}
     </div>
   )
 }
